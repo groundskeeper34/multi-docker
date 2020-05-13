@@ -1,0 +1,22 @@
+sudo: required
+services:
+    - docker
+
+before_install:
+    - docker build -t kuhlchris/react-test -f ./client/Dockerfile.dev ./client
+
+scripts:
+    - docker run -e CI=true kuhlchris/react-test npm test
+
+after_success:
+    - docker build -t kuhlchris/multi-client ./client
+    - docker build -t kuhlchris/multi-nginx ./nginx
+    - docker build -t kuhlchris/multi-server ./server
+    - docker build -t kuhlchris/multi-worker ./worker
+    # Log in to Docker CLI (could do AWS ECR, GCP?)
+    # - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+    # Take these images and push to Docker Hub (AWS ECR, GCP?)
+    # - docker push kuhlchris/multi-client
+    # - docker push kuhlchris/multi-nginx
+    # - docker push kuhlchris/multi-server
+    # - docker push kuhlchris/multi-worker
